@@ -292,9 +292,9 @@ function updateTimerList() {
         let endTimeStr = '';
         
         if (timer.status === 'paused') {
-             timeLeft = timer.remainingMs;
+             timeLeft = timer.remainingMs || 0;
              // Calculate hypothetical end time if resumed now
-             const endD = new Date(Date.now() + timer.remainingMs);
+             const endD = new Date(Date.now() + timeLeft);
              endTimeStr = endD.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         } else {
              const now = Date.now();
@@ -303,15 +303,24 @@ function updateTimerList() {
              endTimeStr = endD.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         }
 
-        const totalMs = timer.originalMinutes * 60 * 1000;
-        progress = ((totalMs - timeLeft) / totalMs) * 100;
+        const minutesVal = timer.originalMinutes || (timer.duration ? timer.duration / 60 : 25);
+        const totalMs = minutesVal * 60 * 1000;
+        
+        if (totalMs > 0) {
+            progress = ((totalMs - timeLeft) / totalMs) * 100;
+        } else {
+            progress = 0;
+        }
+        
         const minutes = Math.floor(timeLeft / 60000);
         const seconds = Math.floor((timeLeft % 60000) / 1000);
         
         // Circular Progress Calculation
         const radius = 50;
+        // Limit progress to 0-100
+        const clampedProgress = Math.min(100, Math.max(0, progress));
         const circumference = 2 * Math.PI * radius;
-        const offset = circumference - (progress / 100) * circumference;
+        const offset = circumference - (clampedProgress / 100) * circumference;
         
         // Pause/Resume Button
         const pauseBtnIcon = timer.status === 'paused' ? '▶️' : '⏸️';

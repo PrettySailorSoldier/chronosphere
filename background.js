@@ -89,15 +89,22 @@ async function handleCreateAlarm(timer) {
   // when = Date.now() + duration (ms)
   await chrome.alarms.create(timer.id, { when: timer.endTime });
   
-  // Tab Freeze Trigger
-  if (timer.name.toLowerCase().includes('break')) {
-      // Unfreeze logic would go here
-  } else {
-      // Focus timer
-      const res = await freezeManager.freezeTabs();
-      if(res.count > 0) {
-          showNotification('Tab Freeze Active', `Frozen ${res.count} tabs to save ~${res.savedMB}MB RAM.`);
+  // Tab Freeze Trigger (Safe Mode)
+  try {
+      if (timer.name.toLowerCase().includes('break')) {
+          // Unfreeze logic would go here
+      } else {
+          // Focus timer
+          if (freezeManager) {
+             const res = await freezeManager.freezeTabs();
+             if(res && res.count > 0) {
+                 showNotification('Tab Freeze Active', `Frozen ${res.count} tabs to save ~${res.savedMB}MB RAM.`);
+             }
+          }
       }
+  } catch (err) {
+      console.error("Tab Freeze Error:", err);
+      // Continue creating timer even if freeze fails
   }
   
   await updateBadge();
@@ -334,7 +341,7 @@ async function updateBadge() {
     const count =  data.timers ? data.timers.length : 0;
     if (count > 0) {
         chrome.action.setBadgeText({text: count.toString()});
-        chrome.action.setBadgeBackgroundColor({color: '#E8B4FA'});
+        chrome.action.setBadgeBackgroundColor({color: '#E056FD'});
     } else {
         chrome.action.setBadgeText({text: ''});
     }

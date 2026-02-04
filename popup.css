@@ -19,40 +19,45 @@ body {
 }
 
 :root {
-  /* Iridescent Gradient Stops */
-  --iris-pink: #E8B4FA;
-  --iris-purple: #B794F6;
-  --iris-blue: #7DD3FC;
-  --iris-teal: #5EEAD4;
-  --iris-mint: #A7F3D0;
+  /* Iridescent Gradient Stops - Updated from Image */
+  --iris-cyan: #00F0FF;    /* Bright Cyan/Teal */
+  --iris-purple: #7B2CBF;  /* Deep Purple/Indigo */
+  --iris-magenta: #E056FD; /* Bright Purple/Magenta */
+  --iris-lime: #B8F428;    /* Lime Green */
+  --iris-yellow: #FFC300;  /* Golden Yellow */
+  --iris-blue: #4facfe;    /* Light Blue */
+  
+  /* Mapped for backward compatibility */
+  --iris-pink: var(--iris-magenta);
+  --iris-teal: var(--iris-cyan);
   
   /* Background - Deep Space */
   --bg-space: #0a0a0f;
   --bg-void: #050508;
-  --bg-nebula: radial-gradient(ellipse at top, rgba(184, 148, 246, 0.15) 0%, transparent 60%);
+  --bg-nebula: radial-gradient(ellipse at top, rgba(123, 44, 191, 0.25) 0%, transparent 60%);
   
   /* Glass - Holographic */
   --glass-holo: linear-gradient(135deg, 
-    rgba(232, 180, 250, 0.1) 0%,
-    rgba(125, 211, 252, 0.1) 50%,
-    rgba(94, 234, 212, 0.1) 100%);
+    rgba(224, 86, 253, 0.1) 0%,
+    rgba(0, 240, 255, 0.1) 50%,
+    rgba(184, 244, 40, 0.1) 100%);
   --glass-border: linear-gradient(135deg,
-    rgba(232, 180, 250, 0.3),
-    rgba(125, 211, 252, 0.3),
-    rgba(94, 234, 212, 0.3));
+    rgba(224, 86, 253, 0.4),
+    rgba(0, 240, 255, 0.4),
+    rgba(184, 244, 40, 0.4));
   
   /* Glows - Chromatic */
-  --glow-pink: 0 0 40px rgba(232, 180, 250, 0.4),
-               0 0 80px rgba(232, 180, 250, 0.2);
-  --glow-blue: 0 0 40px rgba(125, 211, 252, 0.4),
-               0 0 80px rgba(125, 211, 252, 0.2);
-  --glow-teal: 0 0 40px rgba(94, 234, 212, 0.4),
-               0 0 80px rgba(94, 234, 212, 0.2);
+  --glow-magenta: 0 0 40px rgba(224, 86, 253, 0.4),
+               0 0 80px rgba(224, 86, 253, 0.2);
+  --glow-cyan: 0 0 40px rgba(0, 240, 255, 0.4),
+               0 0 80px rgba(0, 240, 255, 0.2);
+  --glow-lime: 0 0 40px rgba(184, 244, 40, 0.4),
+               0 0 80px rgba(184, 244, 40, 0.2);
   
   /* Text */
   --text-glow: rgba(255, 255, 255, 0.95);
-  --text-soft: rgba(255, 255, 255, 0.7);
-  --text-dim: rgba(255, 255, 255, 0.4);
+  --text-soft: rgba(255, 255, 255, 0.75);
+  --text-dim: rgba(255, 255, 255, 0.5);
 }
 
 /* ═══════════════════════════════════════════════════
