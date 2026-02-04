@@ -249,67 +249,120 @@ function updateEnergyPills(activeLevel) {
 // ═══════════════════════════════════════════════════
 
 function createTimer(minutes, name) {
+  // If specific Pomodoro button
+  if (name === 'Pomodoro') {
+      chrome.runtime.sendMessage({ type: 'startPomodoro' });
+      return;
+  }
+
   const id = Date.now().toString();
-  const durationSec = minutes * 60;
-  const endTime = Date.now() + (durationSec * 1000);
+  const endTime = Date.now() + (minutes * 60 * 1000);
   
   const timer = {
     id,
     name,
-    duration: durationSec,
     endTime,
-    status: 'running',
-    originalMinutes: minutes
+    originalMinutes: minutes,
+    duration: minutes,
+    type: 'focus', // default
+    status: 'running'
   };
   
-  state.timers.push(timer);
-  saveState();
-  updateTimerList();
+  // Optimistic UI update
+  updateTimerList(); // Will fetch from storage anyway
   
-  // Send to background to create alarm
-  chrome.runtime.sendMessage({ type: 'createAlarm', timer });
-}
-
-function updateTimerList() {
-  const container = document.getElementById('activeTimers');
-  container.innerHTML = '';
-  
-  state.timers.forEach(timer => {
-    const remaining = Math.max(0, Math.ceil((timer.endTime - Date.now()) / 1000));
-    const mins = Math.floor(remaining / 60);
-    const secs = remaining % 60;
-    const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
-    
-    // Create Timer Card
-    const el = document.createElement('div');
-    el.className = 'glass-card timer-card';
-    el.innerHTML = `
-      <div class="timer-name">${timer.name}</div>
-      <div class="timer-display">${timeStr}</div>
-      <div style="display:flex; justify-content:center; gap:10px;">
-        <button class="glass-button" style="padding: 8px 16px; font-size:12px;" onclick="stopTimer('${timer.id}')">Stop</button>
-      </div>
-    `;
-    
-    // Attach event listener for stop manually (since onclick undefined in extension string)
-    el.querySelector('button').addEventListener('click', () => stopTimer(timer.id));
-    
-    container.appendChild(el);
+  chrome.runtime.sendMessage({ 
+    type: 'createAlarm', 
+    timer: timer 
   });
 }
 
-async function stopTimer(id) {
-    const timer = state.timers.find(t => t.id === id);
-    if(timer) {
-        state.timers = state.timers.filter(t => t.id !== id);
-        await saveState();
-        updateTimerList();
+function updateTimerList() {
+  chrome.storage.local.get(['timers'], (data) => {
+    const list = document.getElementById('activeTimers');
+    list.innerHTML = '';
+    
+    if (data.timers && data.timers.length > 0) {
+      data.timers.forEach(timer => {
+        const el = document.createElement('div');
+        el.className = 'glass-card active-timer-card';
         
-        // Notify background
-        chrome.runtime.sendMessage({ type: 'stopTimer', id });
+        let timeLeft = 0;
+        let progress = 0;
+        let endTimeStr = '';
         
-        // Log incomplete?
+        if (timer.status === 'paused') {
+             timeLeft = timer.remainingMs;
+             // Calculate hypothetical end time if resumed now
+             const endD = new Date(Date.now() + timer.remainingMs);
+             endTimeStr = endD.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        } else {
+             const now = Date.now();
+             timeLeft = Math.max(0, timer.endTime - now);
+             const endD = new Date(timer.endTime);
+             endTimeStr = endD.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        const totalMs = timer.originalMinutes * 60 * 1000;
+        progress = ((totalMs - timeLeft) / totalMs) * 100;
+        const minutes = Math.floor(timeLeft / 60000);
+        const seconds = Math.floor((timeLeft % 60000) / 1000);
+        
+        // Circular Progress Calculation
+        const radius = 50;
+        const circumference = 2 * Math.PI * radius;
+        const offset = circumference - (progress / 100) * circumference;
+        
+        // Pause/Resume Button
+        const pauseBtnIcon = timer.status === 'paused' ? '▶️' : '⏸️';
+        const pauseBtnAction = timer.status === 'paused' ? 'resumeTimer' : 'pauseTimer';
+
+        el.innerHTML = `
+          <div class="timer-circle-wrapper">
+            <svg class="timer-svg" width="120" height="120">
+               <circle class="timer-bg" cx="60" cy="60" r="${radius}"></circle>
+               <circle class="timer-progress" cx="60" cy="60" r="${radius}" 
+                       stroke-dasharray="${circumference}" 
+                       stroke-dashoffset="${offset}"></circle>
+            </svg>
+            <div class="timer-text-overlay">
+                <div class="timer-time">${minutes}:${seconds.toString().padStart(2, '0')}</div>
+            </div>
+          </div>
+          
+          <div class="timer-info">
+            <h3 class="timer-title">${timer.name}</h3>
+            <div class="timer-meta">
+               <span>🔔 Ends at ${endTimeStr}</span>
+            </div>
+            
+            <div class="timer-controls">
+                <button class="icon-btn ${pauseBtnAction}" data-id="${timer.id}">${pauseBtnIcon}</button>
+                <button class="icon-btn stop-btn" data-id="${timer.id}">⏹️</button>
+            </div>
+          </div>
+        `;
+        
+        // Event Listeners for buttons
+        el.querySelector(`.${pauseBtnAction}`).addEventListener('click', () => {
+            chrome.runtime.sendMessage({ type: pauseBtnAction, id: timer.id });
+            setTimeout(updateTimerList, 100); // Quick refresh
+        });
+        
+        el.querySelector('.stop-btn').addEventListener('click', () => {
+            stopTimer(timer.id);
+        });
+
+        list.appendChild(el);
+      });
     }
+  });
+}
+
+function stopTimer(id) {
+  chrome.runtime.sendMessage({ type: 'stopTimer', id });
+  // Remove element immediately for responsiveness
+  setTimeout(updateTimerList, 100);
 }
 
 async function saveState() {

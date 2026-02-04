@@ -69,8 +69,14 @@ async function migrateTimerHistory() {
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === 'createAlarm') {
     handleCreateAlarm(msg.timer);
+  } else if (msg.type === 'startPomodoro') {
+    handleStartPomodoro();
   } else if (msg.type === 'stopTimer') {
     handleStopTimer(msg.id);
+  } else if (msg.type === 'pauseTimer') {
+    handlePauseTimer(msg.id);
+  } else if (msg.type === 'resumeTimer') {
+    handleResumeTimer(msg.id);
   } else if (msg.type === 'playSound') {
       // Forward to offscreen
       chrome.runtime.sendMessage(msg);
@@ -85,8 +91,7 @@ async function handleCreateAlarm(timer) {
   
   // Tab Freeze Trigger
   if (timer.name.toLowerCase().includes('break')) {
-      // Unfreeze if break?
-      // Optional: Logic to unfreeze
+      // Unfreeze logic would go here
   } else {
       // Focus timer
       const res = await freezeManager.freezeTabs();
@@ -95,11 +100,168 @@ async function handleCreateAlarm(timer) {
       }
   }
   
-  updateBadge();
+  await updateBadge();
+}
+
+// ═══════════════════════════════════════════════════
+// POMODORO SEQUENCE LOGIC
+// ═══════════════════════════════════════════════════
+
+async function handleStartPomodoro() {
+    // Initialize new sequence
+    const sequence = {
+        active: true,
+        cycle: 1, // 1-4
+        phase: 'focus', // focus | shortBreak | longBreak
+        totalCycles: 4
+    };
+    
+    await chrome.storage.local.set({ pomodoroSequence: sequence });
+    
+    // Start first timer
+    const id = Date.now().toString();
+    const durationMin = 25;
+    const endTime = Date.now() + (durationMin * 60 * 1000);
+    
+    const timers = [{
+        id,
+        name: "Pomodoro Focus (Cycle 1/4)",
+        endTime,
+        originalMinutes: durationMin,
+        duration: durationMin, // For reference
+        type: 'pomodoro',
+        status: 'running'
+    }];
+    
+    await chrome.storage.local.set({ timers });
+    await handleCreateAlarm(timers[0]);
+}
+
+async function advancePomodoroSequence(finishedTimerId) {
+    const data = await chrome.storage.local.get(['pomodoroSequence']);
+    let seq = data.pomodoroSequence;
+    
+    if (!seq || !seq.active) return;
+    
+    // Logic: Focus -> Short Break -> Focus... -> Focus (4) -> Long Break
+    
+    let nextPhase = '';
+    let nextDuration = 0;
+    let nextName = '';
+    
+    if (seq.phase === 'focus') {
+        if (seq.cycle < seq.totalCycles) {
+            // Next: Short Break
+            nextPhase = 'shortBreak';
+            nextDuration = 5;
+            nextName = `Short Break (Cycle ${seq.cycle})`;
+        } else {
+            // Next: Long Break
+            nextPhase = 'longBreak';
+            nextDuration = 15;
+            nextName = "Long Break 🌴";
+        }
+    } else if (seq.phase === 'shortBreak') {
+        // Next: Focus (Next Cycle)
+        seq.cycle++;
+        nextPhase = 'focus';
+        nextDuration = 25;
+        nextName = `Pomodoro Focus (Cycle ${seq.cycle}/${seq.totalCycles})`;
+    } else if (seq.phase === 'longBreak') {
+        // Sequence Complete
+        seq.active = false;
+        await chrome.storage.local.set({ pomodoroSequence: seq });
+        showNotification('Sequence Complete', 'Great job! You finished a full Pomodoro cycle.');
+        return;
+    }
+    
+    // Update sequence
+    seq.phase = nextPhase;
+    await chrome.storage.local.set({ pomodoroSequence: seq });
+    
+    // Start Next Timer
+    const id = Date.now().toString();
+    const endTime = Date.now() + (nextDuration * 60 * 1000);
+    
+    const newTimer = {
+        id,
+        name: nextName,
+        endTime,
+        originalMinutes: nextDuration,
+        duration: nextDuration,
+        type: 'pomodoro',
+        status: 'running'
+    };
+    
+    // Add to timers list
+    const tData = await chrome.storage.local.get(['timers']);
+    const timers = tData.timers || [];
+    timers.push(newTimer);
+    await chrome.storage.local.set({ timers });
+    
+    await handleCreateAlarm(newTimer);
+    
+    showNotification('Next Phase Starting', `Starting: ${nextName}`);
+}
+
+
+// ═══════════════════════════════════════════════════
+// TIMER CONTROLS
+// ═══════════════════════════════════════════════════
+
+async function handlePauseTimer(id) {
+    const data = await chrome.storage.local.get(['timers']);
+    let timers = data.timers || [];
+    const timerIndex = timers.findIndex(t => t.id === id);
+    
+    if (timerIndex > -1) {
+        const timer = timers[timerIndex];
+        const now = Date.now();
+        const remainingMs = timer.endTime - now;
+        
+        timer.status = 'paused';
+        timer.remainingMs = remainingMs;
+        timers[timerIndex] = timer;
+        
+        await chrome.alarms.clear(id); // Stop alarm
+        await chrome.storage.local.set({ timers });
+    }
+}
+
+async function handleResumeTimer(id) {
+    const data = await chrome.storage.local.get(['timers']);
+    let timers = data.timers || [];
+    const timerIndex = timers.findIndex(t => t.id === id);
+    
+    if (timerIndex > -1) {
+        const timer = timers[timerIndex];
+        const now = Date.now();
+        
+        timer.status = 'running';
+        timer.endTime = now + timer.remainingMs; // New end time
+        delete timer.remainingMs;
+        timers[timerIndex] = timer;
+        
+        await chrome.storage.local.set({ timers });
+        await handleCreateAlarm(timer); // Re-create alarm
+    }
 }
 
 async function handleStopTimer(id) {
     await chrome.alarms.clear(id);
+    
+    // If part of sequence, kill sequence
+    const data = await chrome.storage.local.get(['pomodoroSequence', 'timers']);
+    if (data.pomodoroSequence && data.pomodoroSequence.active) {
+        // Check if this timer was the active one?
+        // Simpler: Just kill sequence if user manually stops a timer
+        await chrome.storage.local.set({ pomodoroSequence: { active: false } });
+    }
+
+    let timers = data.timers || [];
+    timers = timers.filter(t => t.id !== id);
+    await chrome.storage.local.set({ timers });
+    
     updateBadge();
 }
 
@@ -107,7 +269,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   // Alarm fired = Timer Done
   const id = alarm.name;
   
-  const data = await chrome.storage.local.get(['timers', 'history', 'stats', 'sound', 'volume']);
+  const data = await chrome.storage.local.get(['timers', 'history', 'stats', 'sound', 'volume', 'pomodoroSequence']);
   let timers = data.timers || [];
   const timer = timers.find(t => t.id === id);
   
@@ -135,21 +297,25 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
         timestamp: Date.now(),
         hourOfDay: now.getHours(),
         dayOfWeek: now.getDay(),
-        type: 'focus' // simplified, could infer
+        type: timer.type // 'focus' or 'pomodoro'
     });
     
     // 4. Update Stats
     const stats = data.stats || { dailyCount: 0, focusTime: 0, streak: 0 };
     stats.dailyCount++;
     stats.focusTime += timer.originalMinutes;
-    stats.streak++; // Simple increment
+    stats.streak++; 
     
     // 5. Remove from active timers
     timers = timers.filter(t => t.id !== id);
-    
     await chrome.storage.local.set({ timers, history, stats });
     
     updateBadge();
+    
+    // 6. Check Sequence
+    if (timer.type === 'pomodoro' && data.pomodoroSequence && data.pomodoroSequence.active) {
+        await advancePomodoroSequence(id);
+    }
   }
 });
 
