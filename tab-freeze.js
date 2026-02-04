@@ -44,9 +44,10 @@ class TabFreezeManager {
     // Query all tabs
     const tabs = await chrome.tabs.query({});
     
-    // Filter out active tabs, audible tabs, and whitelisted tabs
+    // Filter out active tabs, audible tabs, whitelisted tabs, and ALREADY DISCARDED tabs
     const toFreeze = tabs.filter(tab => 
       !tab.active && 
+      !tab.discarded && 
       !tab.audible &&
       !this.isWhitelisted(tab.url)
     );
@@ -57,7 +58,8 @@ class TabFreezeManager {
         await chrome.tabs.discard(tab.id);
         count++;
       } catch (e) {
-        console.warn('Failed to discard tab', tab.id);
+        // Silent fail - tab might have closed or cannot be discarded
+        // console.warn('Failed to discard tab', tab.id); 
       }
     }
 
