@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chrono Sphere</title>
   <link rel="stylesheet" href="popup.css">
 </head>
+
 <body>
   <div class="container">
-    
+
     <!-- HEADER -->
     <header class="header">
       <div class="header-top">
@@ -18,25 +20,7 @@
           <span class="label" id="circadianLabel">Peak Focus</span>
         </div>
       </div>
-      
-      <!-- ASYMMETRIC STATS GRID (2fr 1fr 1fr) -->
-      <div class="stats-ribbon">
-        <div class="stat-item">
-          <span class="stat-icon">🔥</span>
-          <span class="stat-value" id="dailyCount">0</span>
-          <span class="stat-label">Done</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">⏱️</span>
-          <span class="stat-value" id="focusTime">0m</span>
-          <span class="stat-label">Focus</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-icon">⭐</span>
-          <span class="stat-value" id="streak">1</span>
-          <span class="stat-label">Streak</span>
-        </div>
-      </div>
+
     </header>
 
     <!-- CIRCADIAN SECTION -->
@@ -45,7 +29,7 @@
         <span class="icon">☀️</span>
         <span>Circadian Rhythm</span>
       </div>
-      
+
       <div class="energy-slider-wrapper">
         <div class="slider-icons">
           <span class="slider-icon">🌙</span>
@@ -53,25 +37,22 @@
         </div>
         <input type="range" class="energy-slider" id="energySlider" min="1" max="3" value="2">
       </div>
-      
+
       <div class="circadian-presets">
         <button class="preset-pill" data-energy="low">Energize</button>
         <button class="preset-pill active" data-energy="medium">Balanced</button>
         <button class="preset-pill" data-energy="high">Relax</button>
       </div>
-      
+
       <div class="circadian-recommendation">
         <span class="rec-icon">💡</span>
-        <span class="rec-text" id="circadianRec">Try 45-52 min sessions now (peak window)</span>
+        <span class="rec-text" id="circadianRec">Loading recommendations...</span>
       </div>
     </section>
 
     <!-- NATURAL LANGUAGE TIMER INPUT -->
     <section class="glass-card">
-      <input type="text" 
-             class="glass-input" 
-             id="quickTimerInput" 
-             placeholder='E.g., "30 minutes of deep work"'>
+      <input type="text" class="glass-input" id="quickTimerInput" placeholder='E.g., "30 minutes of deep work"'>
       <button class="glass-button create-btn" id="quickCreateBtn">
         Create Timer →
       </button>
@@ -83,7 +64,7 @@
         <span class="icon">⏰</span>
         <span>Quick Timers</span>
       </div>
-      
+
       <div class="presets-grid">
         <!-- Pomodoro spans 2 rows -->
         <button class="preset-btn" data-minutes="25" data-name="Pomodoro" style="grid-row: span 2;">
@@ -91,19 +72,19 @@
           <span class="preset-name">Pomodoro</span>
           <span class="preset-time">25min</span>
         </button>
-        
+
         <button class="preset-btn" data-minutes="5" data-name="Short Break">
           <span class="preset-emoji">☕</span>
           <span class="preset-name">Short Break</span>
           <span class="preset-time">5min</span>
         </button>
-        
+
         <button class="preset-btn" data-minutes="15" data-name="Long Break">
           <span class="preset-emoji">🌴</span>
           <span class="preset-name">Long Break</span>
           <span class="preset-time">15min</span>
         </button>
-        
+
         <button class="preset-btn" data-minutes="52" data-name="Deep Work">
           <span class="preset-emoji">🎯</span>
           <span class="preset-name">Deep Work</span>
@@ -122,9 +103,9 @@
           <span class="toggle-slider"></span>
         </div>
       </div>
-      
+
       <p class="feature-description">Pause inactive tabs during focus to save RAM</p>
-      
+
       <div class="whitelist-chips" id="whitelistBox">
         <!-- Chips generated dynamically -->
         <button class="chip-add" id="addWhitelistBtn">+ Add</button>
@@ -142,8 +123,8 @@
         <span class="icon">🔊</span>
         <span>Sound</span>
       </div>
-      <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-        <select class="glass-input" id="soundSelect" style="flex: 1;">
+      <div class="sound-controls">
+        <select class="glass-input sound-select" id="soundSelect">
           <option value="chime">Chime</option>
           <option value="water">Water</option>
           <option value="alarm">Alarm</option>
@@ -152,12 +133,13 @@
           <option value="gong">Gong</option>
           <option value="piano">Piano</option>
         </select>
-        <button id="previewSoundBtn" class="glass-button" style="padding: 10px;">▶️</button>
+        <button id="previewSoundBtn" class="sound-preview-btn">▶️</button>
       </div>
-      <input type="range" id="volumeControl" min="0" max="100" value="80" style="width: 100%;">
+      <input type="range" id="volumeControl" min="0" max="100" value="80" class="volume-slider">
     </section>
 
   </div>
   <script src="popup.js"></script>
 </body>
+
 </html>

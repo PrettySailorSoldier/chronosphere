@@ -243,79 +243,7 @@ body::after {
   margin-bottom: 0;
 }
 
-/* Stats - Asymmetric Grid like the teal app */
-.stats-ribbon {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 12px;
-}
 
-.stat-item {
-  background: linear-gradient(135deg,
-    rgba(30, 30, 40, 0.5),
-    rgba(20, 20, 30, 0.6));
-  backdrop-filter: blur(20px);
-  border-radius: 12px;
-  padding: 16px;
-  border: 1px solid rgba(232, 180, 250, 0.15);
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Holographic accent on first stat */
-.stat-item:first-child {
-  grid-column: span 1;
-  background: linear-gradient(135deg,
-    rgba(232, 180, 250, 0.15),
-    rgba(125, 211, 252, 0.1));
-  border-color: rgba(232, 180, 250, 0.3);
-}
-
-.stat-item::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg,
-    transparent,
-    rgba(232, 180, 250, 0.6),
-    transparent);
-  animation: shimmer 3s infinite;
-}
-
-@keyframes shimmer {
-  0%, 100% { opacity: 0; }
-  50% { opacity: 1; }
-}
-
-.stat-value {
-  font-size: 28px;
-  font-weight: 700;
-  background: linear-gradient(135deg,
-    rgba(255, 255, 255, 0.95),
-    rgba(232, 180, 250, 0.8));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: block;
-  margin-bottom: 4px;
-}
-
-.stat-label {
-  font-size: 11px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  font-weight: 500;
-}
-
-.stat-icon {
-    font-size: 16px;
-    margin-bottom: 4px;
-}
 
 /* ═══════════════════════════════════════════════════
    ENERGY SLIDER - HOLOGRAPHIC
@@ -547,12 +475,12 @@ body::after {
 }
 
 .preset-btn {
-  padding: 20px 16px;
+  padding: 12px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
   background: linear-gradient(135deg,
     rgba(30, 30, 40, 0.5),
     rgba(20, 20, 30, 0.6));
@@ -598,18 +526,18 @@ body::after {
 }
 
 .preset-emoji {
-  font-size: 36px;
+  font-size: 24px;
   filter: drop-shadow(0 0 10px rgba(232, 180, 250, 0.5));
 }
 
 .preset-name {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--text-glow);
 }
 
 .preset-time {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-dim);
   font-weight: 500;
 }
@@ -865,3 +793,43 @@ input:checked + .toggle-slider:before {
     color: var(--text-dim);
     margin-top: 4px;
 }
+
+/* Sound Controls */
+.sound-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.sound-select {
+    flex: 1;
+}
+
+.sound-preview-btn {
+    padding: 14px 18px;
+    background: linear-gradient(135deg,
+        rgba(30, 30, 40, 0.6),
+        rgba(20, 20, 30, 0.7));
+    backdrop-filter: blur(20px);
+    border-radius: 12px;
+    border: 1px solid rgba(232, 180, 250, 0.3);
+    color: var(--text-glow);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.sound-preview-btn:hover {
+    border-color: rgba(232, 180, 250, 0.6);
+    box-shadow: 
+        0 0 20px rgba(232, 180, 250, 0.4),
+        0 0 40px rgba(125, 211, 252, 0.2);
+    transform: scale(1.05);
+}
+
+.volume-slider {
+    width: 100%;
+}
+

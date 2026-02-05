@@ -106,13 +106,46 @@ function updateCircadianRec() {
   document.getElementById('circadianIcon').textContent = pattern.icon;
   document.getElementById('circadianLabel').textContent = pattern.msg;
   
-  // Update Recommendation Text
+  // Update Recommendation Text with smarter suggestions
   // Apply multiplier based on CURRENT user energy setting
   const multiplier = ENERGY_MULTIPLIERS[state.userEnergy];
   const recommendedMinutes = Math.round((pattern.duration / 60) * multiplier);
   
-  document.getElementById('circadianRec').textContent = 
-    `Try ${recommendedMinutes} min sessions now (${pattern.msg.toLowerCase()})`;
+  // Generate smart task suggestions based on time and energy
+  let suggestion = '';
+  
+  if (pattern.energy === 'high') {
+    // Peak focus times - suggest deep work
+    if (hour >= 9 && hour <= 11) {
+      suggestion = `💡 Peak focus window! Try ${recommendedMinutes}min deep work sessions`;
+    } else if (hour >= 16 && hour <= 17) {
+      suggestion = `⚡ Second wind! Perfect for ${recommendedMinutes}min creative tasks`;
+    } else {
+      suggestion = `🎯 High energy! Try ${recommendedMinutes}min focused work`;
+    }
+  } else if (pattern.energy === 'medium') {
+    // Medium energy - suggest moderate tasks
+    if (hour === 12) {
+      suggestion = `🍽️ Lunch time! Consider ${recommendedMinutes}min light tasks or breaks`;
+    } else if (hour >= 15 && hour <= 15) {
+      suggestion = `📈 Recovering energy. Try ${recommendedMinutes}min moderate tasks`;
+    } else if (hour >= 18 && hour <= 21) {
+      suggestion = `🌆 Evening mode. ${recommendedMinutes}min sessions work well now`;
+    } else {
+      suggestion = `⚖️ Balanced energy. ${recommendedMinutes}min sessions recommended`;
+    }
+  } else {
+    // Low energy - suggest rest or light tasks
+    if (hour >= 22 || hour <= 4) {
+      suggestion = `🌙 Rest time. If working, keep to ${recommendedMinutes}min max`;
+    } else if (hour >= 13 && hour <= 14) {
+      suggestion = `😴 Post-lunch dip. Short ${recommendedMinutes}min sessions or take a break`;
+    } else {
+      suggestion = `✨ Low energy. Light ${recommendedMinutes}min tasks or rest`;
+    }
+  }
+  
+  document.getElementById('circadianRec').textContent = suggestion;
 }
 
 // ═══════════════════════════════════════════════════
@@ -393,16 +426,17 @@ function startUpdateLoop() {
 }
 
 // ═══════════════════════════════════════════════════
-// STATS
+// STATS (Removed from UI but kept in storage for future use)
 // ═══════════════════════════════════════════════════
 
 function initStats() {
-    document.getElementById('dailyCount').textContent = state.stats.dailyCount;
-    // Format focus time
-    const h = Math.floor(state.stats.focusTime / 60);
-    const m = state.stats.focusTime % 60;
-    document.getElementById('focusTime').textContent = h > 0 ? `${h}h ${m}m` : `${m}m`;
-    document.getElementById('streak').textContent = state.stats.streak;
+    // Stats UI removed to save space
+    // Data still tracked in background for potential future features
+    // document.getElementById('dailyCount').textContent = state.stats.dailyCount;
+    // const h = Math.floor(state.stats.focusTime / 60);
+    // const m = state.stats.focusTime % 60;
+    // document.getElementById('focusTime').textContent = h > 0 ? `${h}h ${m}m` : `${m}m`;
+    // document.getElementById('streak').textContent = state.stats.streak;
 }
 
 // ═══════════════════════════════════════════════════
