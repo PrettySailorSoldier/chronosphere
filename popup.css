@@ -178,7 +178,36 @@ body::after {
   opacity: 0.7;
 }
 
+/* Subtle glass reflection shimmer */
+.glass-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.03) 50%,
+    transparent 100%
+  );
+  transform: skewX(-15deg);
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
 
+.glass-card:hover::after {
+  opacity: 1;
+  animation: subtle-shine 1.5s ease-out forwards;
+}
+
+@keyframes subtle-shine {
+  0% { left: -100%; }
+  100% { left: 150%; }
+}
 
 .glass-card:hover {
   transform: translateY(-2px);
@@ -378,6 +407,45 @@ body::after {
     padding: 8px 12px;
     border-radius: 8px;
     border: 1px solid rgba(94, 234, 212, 0.2);
+}
+
+/* Suggested Task Cards */
+.suggested-tasks {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.suggested-task {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background: rgba(30, 30, 40, 0.5);
+    border: 1px solid rgba(232, 180, 250, 0.15);
+    border-radius: 20px;
+    font-size: 11px;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+}
+
+.suggested-task:hover {
+    background: rgba(232, 180, 250, 0.15);
+    border-color: rgba(232, 180, 250, 0.4);
+    color: var(--text-glow);
+    transform: translateY(-1px);
+}
+
+.suggested-task .task-icon {
+    font-size: 12px;
+}
+
+.suggested-task .task-time {
+    color: var(--iris-teal);
+    font-weight: 600;
 }
 
 /* ═══════════════════════════════════════════════════

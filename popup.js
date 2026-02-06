@@ -106,46 +106,134 @@ function updateCircadianRec() {
   document.getElementById('circadianIcon').textContent = pattern.icon;
   document.getElementById('circadianLabel').textContent = pattern.msg;
   
-  // Update Recommendation Text with smarter suggestions
   // Apply multiplier based on CURRENT user energy setting
   const multiplier = ENERGY_MULTIPLIERS[state.userEnergy];
   const recommendedMinutes = Math.round((pattern.duration / 60) * multiplier);
   
-  // Generate smart task suggestions based on time and energy
+  // Generate detailed productivity tips based on actual time
   let suggestion = '';
   
-  if (pattern.energy === 'high') {
-    // Peak focus times - suggest deep work
-    if (hour >= 9 && hour <= 11) {
-      suggestion = `💡 Peak focus window! Try ${recommendedMinutes}min deep work sessions`;
-    } else if (hour >= 16 && hour <= 17) {
-      suggestion = `⚡ Second wind! Perfect for ${recommendedMinutes}min creative tasks`;
-    } else {
-      suggestion = `🎯 High energy! Try ${recommendedMinutes}min focused work`;
-    }
-  } else if (pattern.energy === 'medium') {
-    // Medium energy - suggest moderate tasks
-    if (hour === 12) {
-      suggestion = `🍽️ Lunch time! Consider ${recommendedMinutes}min light tasks or breaks`;
-    } else if (hour >= 15 && hour <= 15) {
-      suggestion = `📈 Recovering energy. Try ${recommendedMinutes}min moderate tasks`;
-    } else if (hour >= 18 && hour <= 21) {
-      suggestion = `🌆 Evening mode. ${recommendedMinutes}min sessions work well now`;
-    } else {
-      suggestion = `⚖️ Balanced energy. ${recommendedMinutes}min sessions recommended`;
-    }
-  } else {
-    // Low energy - suggest rest or light tasks
-    if (hour >= 22 || hour <= 4) {
-      suggestion = `🌙 Rest time. If working, keep to ${recommendedMinutes}min max`;
-    } else if (hour >= 13 && hour <= 14) {
-      suggestion = `😴 Post-lunch dip. Short ${recommendedMinutes}min sessions or take a break`;
-    } else {
-      suggestion = `✨ Low energy. Light ${recommendedMinutes}min tasks or rest`;
-    }
+  // Early Morning (5-7am)
+  if (hour >= 5 && hour <= 7) {
+    suggestion = `🌅 Morning routine time. Start with ${recommendedMinutes}min planning or light tasks before peak focus`;
+  }
+  // Morning Peak (8-11am)
+  else if (hour >= 8 && hour <= 11) {
+    suggestion = `🧠 Peak cognitive time! Tackle complex problems, writing, or coding in ${recommendedMinutes}min blocks`;
+  }
+  // Lunch Transition (12pm)
+  else if (hour === 12) {
+    suggestion = `🍽️ Take a proper break. Light ${recommendedMinutes}min tasks only - save deep work for later`;
+  }
+  // Post-Lunch Dip (1-2pm)
+  else if (hour >= 13 && hour <= 14) {
+    suggestion = `😴 Natural energy dip. Try ${recommendedMinutes}min of admin tasks, emails, or take a power nap`;
+  }
+  // Afternoon Recovery (3pm)
+  else if (hour === 15) {
+    suggestion = `📈 Energy returning. Good for ${recommendedMinutes}min collaborative work or meetings`;
+  }
+  // Second Wind (4-5pm)
+  else if (hour >= 16 && hour <= 17) {
+    suggestion = `⚡ Second wind! Great for ${recommendedMinutes}min creative tasks, brainstorming, or finishing projects`;
+  }
+  // Evening Work (6-7pm)
+  else if (hour >= 18 && hour <= 19) {
+    suggestion = `🌆 Evening focus. ${recommendedMinutes}min sessions for wrapping up or personal projects`;
+  }
+  // Evening Wind Down (8-9pm)
+  else if (hour >= 20 && hour <= 21) {
+    suggestion = `🌙 Winding down. Light ${recommendedMinutes}min tasks - avoid screens if possible`;
+  }
+  // Pre-Sleep (10-11pm)
+  else if (hour >= 22 && hour <= 23) {
+    suggestion = `✨ Rest time approaching. Only essential ${recommendedMinutes}min tasks - protect your sleep`;
+  }
+  // Night Owl (12am-4am)
+  else if (hour >= 0 && hour <= 4) {
+    suggestion = `🦉 Late night. If you must work, keep to quick ${recommendedMinutes}min sprints with breaks`;
+  }
+  // Default fallback
+  else {
+    suggestion = `💡 Try ${recommendedMinutes}min focused sessions based on your current energy`;
   }
   
   document.getElementById('circadianRec').textContent = suggestion;
+  
+  // Generate suggested task cards based on time and energy
+  renderSuggestedTasks(hour, recommendedMinutes);
+}
+
+function renderSuggestedTasks(hour, baseMinutes) {
+  const container = document.getElementById('suggestedTasks');
+  container.innerHTML = '';
+  
+  // Define task suggestions based on time of day
+  let tasks = [];
+  
+  // Morning (5-11am) - Productive tasks
+  if (hour >= 5 && hour <= 11) {
+    tasks = [
+      { icon: '🧠', name: 'Deep Work', minutes: baseMinutes },
+      { icon: '✍️', name: 'Writing', minutes: Math.round(baseMinutes * 0.8) },
+      { icon: '📋', name: 'Planning', minutes: Math.round(baseMinutes * 0.5) }
+    ];
+  }
+  // Lunch (12pm) - Light tasks
+  else if (hour === 12) {
+    tasks = [
+      { icon: '📧', name: 'Emails', minutes: 15 },
+      { icon: '🚶', name: 'Walk Break', minutes: 10 },
+      { icon: '📖', name: 'Reading', minutes: 20 }
+    ];
+  }
+  // Post-lunch dip (1-2pm) - Recovery
+  else if (hour >= 13 && hour <= 14) {
+    tasks = [
+      { icon: '😴', name: 'Power Nap', minutes: 20 },
+      { icon: '📧', name: 'Admin Tasks', minutes: baseMinutes },
+      { icon: '🎧', name: 'Light Work', minutes: Math.round(baseMinutes * 0.7) }
+    ];
+  }
+  // Afternoon (3-5pm) - Second wind
+  else if (hour >= 15 && hour <= 17) {
+    tasks = [
+      { icon: '💡', name: 'Creative Work', minutes: baseMinutes },
+      { icon: '🤝', name: 'Collaboration', minutes: 30 },
+      { icon: '🎯', name: 'Finish Tasks', minutes: Math.round(baseMinutes * 0.6) }
+    ];
+  }
+  // Evening (6-9pm) - Wind down
+  else if (hour >= 18 && hour <= 21) {
+    tasks = [
+      { icon: '📝', name: 'Review Day', minutes: 15 },
+      { icon: '📚', name: 'Learning', minutes: baseMinutes },
+      { icon: '🧘', name: 'Mindfulness', minutes: 10 }
+    ];
+  }
+  // Night (10pm-4am) - Rest focused
+  else {
+    tasks = [
+      { icon: '📖', name: 'Light Reading', minutes: 15 },
+      { icon: '🧘', name: 'Relax', minutes: 10 },
+      { icon: '✨', name: 'Quick Task', minutes: Math.round(baseMinutes * 0.5) }
+    ];
+  }
+  
+  // Render task cards
+  tasks.forEach(task => {
+    const card = document.createElement('button');
+    card.className = 'suggested-task';
+    card.innerHTML = `
+      <span class="task-icon">${task.icon}</span>
+      <span class="task-name">${task.name}</span>
+      <span class="task-time">${task.minutes}m</span>
+    `;
+    card.addEventListener('click', () => {
+      createTimer(task.minutes, task.name);
+    });
+    container.appendChild(card);
+  });
 }
 
 // ═══════════════════════════════════════════════════
