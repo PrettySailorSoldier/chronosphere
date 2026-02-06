@@ -253,7 +253,7 @@ function initEventListeners() {
   document.getElementById('previewSoundBtn').addEventListener('click', () => {
       chrome.runtime.sendMessage({
           type: 'playSound',
-          source: `sounds/${state.sound}.mp3`,
+          source: `sounds/${state.sound}.wav`,
           volume: state.volume
       });
   });
@@ -444,6 +444,19 @@ function initStats() {
 // ═══════════════════════════════════════════════════
 
 function initTabFreeze() {
+    // Tab Freeze Toggle
+    const toggleInput = document.getElementById('tabFreezeEnabled');
+    
+    // Load saved state
+    chrome.storage.local.get(['freezeEnabled'], (res) => {
+        toggleInput.checked = res.freezeEnabled !== false; // Default true
+    });
+    
+    // Save on change
+    toggleInput.addEventListener('change', (e) => {
+        chrome.storage.local.set({ freezeEnabled: e.target.checked });
+    });
+    
     const addBtn = document.getElementById('addWhitelistBtn');
     addBtn.addEventListener('click', () => {
         const domain = prompt("Enter domain to whitelist (e.g. spotify.com):");

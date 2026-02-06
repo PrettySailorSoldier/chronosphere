@@ -78,10 +78,24 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   } else if (msg.type === 'resumeTimer') {
     handleResumeTimer(msg.id);
   } else if (msg.type === 'playSound') {
-      // Forward to offscreen
-      chrome.runtime.sendMessage(msg);
+      // Ensure offscreen exists before forwarding
+      handlePlaySound(msg.source, msg.volume);
   }
 });
+
+async function handlePlaySound(source, volume) {
+    try {
+        await createOffscreen();
+        // Forward to offscreen document
+        chrome.runtime.sendMessage({
+            type: 'playSound',
+            source: source,
+            volume: volume
+        });
+    } catch (error) {
+        console.warn('Could not play sound:', error);
+    }
+}
 
 async function handleCreateAlarm(timer) {
   // Create alarm
@@ -286,7 +300,7 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
     const volume = data.volume || 0.8;
     chrome.runtime.sendMessage({
         type: 'playSound',
-        source: `sounds/${soundName}.mp3`,
+        source: `sounds/${soundName}.wav`,
         volume: volume
     });
     
