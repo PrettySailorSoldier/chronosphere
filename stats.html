@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="popup.css">
+    <script src="theme.js"></script>
+    <style>
+        .stats-container {
+            padding: 20px;
+            min-height: 500px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--periwinkle);
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 8px 0;
+        }
+
+        .back-btn:hover {
+            color: var(--bright-pink);
+        }
+
+        .stats-section {
+            background: var(--dark-card);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(155, 135, 245, 0.2);
+        }
+
+        .stats-section h3 {
+            font-size: 14px;
+            color: var(--periwinkle);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        /* Overview Cards */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .overview-card {
+            background: var(--dark-bg);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .overview-value {
+            font-size: 28px;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--periwinkle), var(--bright-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .overview-label {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        /* Weekly Chart */
+        .chart-container {
+            height: 150px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 10px 0;
+        }
+
+        .chart-bar-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+        }
+
+        .chart-bar {
+            width: 100%;
+            max-width: 40px;
+            background: linear-gradient(180deg, var(--periwinkle), var(--bright-pink));
+            border-radius: 6px 6px 0 0;
+            transition: height 0.5s ease;
+            min-height: 4px;
+        }
+
+        .chart-bar:hover {
+            filter: brightness(1.2);
+        }
+
+        .chart-label {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 8px;
+            text-transform: uppercase;
+        }
+
+        .chart-value {
+            font-size: 10px;
+            color: var(--sunset-orange);
+            margin-bottom: 5px;
+        }
+
+        .bar-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        /* Period Selector */
+        .period-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .period-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid var(--dark-card-light);
+            border-radius: 10px;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .period-btn.active {
+            border-color: var(--periwinkle);
+            color: #fff;
+            background: rgba(155, 135, 245, 0.1);
+        }
+
+        .period-btn:hover {
+            border-color: var(--periwinkle);
+        }
+
+        /* Goals Section */
+        .goal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--dark-bg);
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .goal-info {
+            flex: 1;
+        }
+
+        .goal-name {
+            font-size: 14px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .goal-progress-bar {
+            height: 6px;
+            background: var(--dark-card-light);
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .goal-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--periwinkle), var(--bright-pink));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .goal-stats {
+            text-align: right;
+            margin-left: 15px;
+        }
+
+        .goal-current {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--periwinkle);
+        }
+
+        .goal-target {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Goal Editor */
+        .goal-editor {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(155, 135, 245, 0.1);
+        }
+
+        .goal-input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid var(--dark-card-light);
+            border-radius: 8px;
+            background: var(--dark-bg);
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .goal-input:focus {
+            outline: none;
+            border-color: var(--periwinkle);
+        }
+
+        .save-goal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--periwinkle), var(--bright-pink));
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .save-goal-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Export Button */
+        .export-btn {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--periwinkle);
+            border-radius: 12px;
+            background: transparent;
+            color: var(--periwinkle);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .export-btn:hover {
+            background: var(--periwinkle);
+            color: #fff;
+        }
+
+        /* Best Day Highlight */
+        .best-day {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: linear-gradient(135deg, rgba(255, 210, 63, 0.1), rgba(255, 140, 66, 0.1));
+            border: 1px solid rgba(255, 210, 63, 0.3);
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .best-day-icon {
+            font-size: 24px;
+        }
+
+        .best-day-info {
+            flex: 1;
+        }
+
+        .best-day-label {
+            font-size: 11px;
+            color: var(--sunset-yellow);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .best-day-value {
+            font-size: 14px;
+            color: #fff;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="stats-container">
+        <button class="back-btn" id="backBtn" aria-label="Go back to timer">← Back to Timer</button>
+
+        <div class="header">
+            <h1>📊 Statistics</h1>
+        </div>
+
+        <!-- Overview -->
+        <div class="stats-section" role="region" aria-label="Statistics overview">
+            <h3 id="overviewHeading">📈 Overview</h3>
+            <div class="overview-grid" role="group" aria-labelledby="overviewHeading">
+                <div class="overview-card">
+                    <div class="overview-value" id="totalSessions" aria-label="Total sessions completed">0</div>
+                    <div class="overview-label" aria-hidden="true">Total Sessions</div>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-value" id="totalFocusTime" aria-label="Total focus time">0h</div>
+                    <div class="overview-label" aria-hidden="true">Focus Time</div>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-value" id="avgSession" aria-label="Average session duration">0m</div>
+                    <div class="overview-label" aria-hidden="true">Avg Session</div>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-value" id="currentStreak" aria-label="Current day streak">0</div>
+                    <div class="overview-label" aria-hidden="true">Day Streak 🔥</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weekly Chart -->
+        <div class="stats-section" role="region" aria-label="Activity chart">
+            <h3 id="activityHeading">📅 Activity</h3>
+            <div class="period-selector" role="group" aria-label="Select time period">
+                <button class="period-btn active" data-period="week" aria-pressed="true">This Week</button>
+                <button class="period-btn" data-period="month" aria-pressed="false">This Month</button>
+            </div>
+            <div class="chart-container" id="activityChart" role="img" aria-label="Activity chart showing focus time by day">
+                <!-- Chart bars will be rendered here -->
+            </div>
+            <div class="best-day" id="bestDay" style="display: none;" role="status" aria-live="polite">
+                <span class="best-day-icon" aria-hidden="true">🏆</span>
+                <div class="best-day-info">
+                    <div class="best-day-label" aria-hidden="true">Best Day</div>
+                    <div class="best-day-value" id="bestDayValue" aria-label="Best productivity day">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Goals -->
+        <div class="stats-section" role="region" aria-label="Daily goal settings">
+            <h3 id="goalHeading">🎯 Daily Goal</h3>
+            <div class="goal-item" role="group" aria-labelledby="goalHeading">
+                <div class="goal-info">
+                    <div class="goal-name" id="goalName">Focus Time Goal</div>
+                    <div class="goal-progress-bar" role="progressbar" aria-labelledby="goalName" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div class="goal-progress-fill" id="goalProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="goal-stats">
+                    <div class="goal-current" id="goalCurrent" aria-label="Current progress">0m</div>
+                    <div class="goal-target">of <span id="goalTarget">60</span>m</div>
+                </div>
+            </div>
+            <div class="goal-editor">
+                <input type="number" class="goal-input" id="goalInput" placeholder="Daily goal (minutes)" min="1" max="480" aria-label="Set daily focus goal in minutes">
+                <button class="save-goal-btn" id="saveGoalBtn" aria-label="Save daily goal">Set Goal</button>
+            </div>
+        </div>
+
+        <!-- Export -->
+        <div class="stats-section" role="region" aria-label="Data export">
+            <h3>💾 Export Data</h3>
+            <button class="export-btn" id="exportBtn" aria-label="Export all statistics as JSON file">📥 Export as JSON</button>
+        </div>
+    </div>
+
+    <script src="stats.js"></script>
+</body>
+
+</html>

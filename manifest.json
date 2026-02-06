@@ -1,39 +1,47 @@
 {
-  "manifest_version": 3,
-  "name": "Chrono Sphere",
-  "version": "2.0.0",
-  "description": "Aethereal neon gothic timer with holographic glassmorphism UI, circadian optimization, and advanced productivity features.",
-  "permissions": [
-    "storage",
-    "alarms",
-    "notifications",
-    "offscreen",
-    "tabs",
-    "system.memory"
-  ],
-  "host_permissions": [
-    "<all_urls>"
-  ],
-  "action": {
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
+    "manifest_version": 3,
+    "name": "Chrono Sphere",
+    "version": "1.0",
+    "description": "A holographic productivity timer with multiple modes",
+    "icons": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": "icons/icon48.png"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "permissions": [
+        "storage",
+        "alarms",
+        "offscreen",
+        "notifications"
+    ],
+    "commands": {
+        "start-pomodoro": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+P",
+                "mac": "Command+Shift+P"
+            },
+            "description": "Start a Pomodoro Timer"
+        },
+        "start-break": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+B",
+                "mac": "Command+Shift+B"
+            },
+            "description": "Start a Short Break"
+        },
+        "pause-resume": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+U",
+                "mac": "Command+Shift+U"
+            },
+            "description": "Pause/Resume Timer"
+        }
     }
-  },
-  "background": {
-    "service_worker": "background.js"
-  },
-  "icons": {
-    "16": "icons/icon16.png",
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
-  },
-  "web_accessible_resources": [
-    {
-      "resources": ["sounds/*.mp3", "offscreen.html"],
-      "matches": ["<all_urls>"]
-    }
-  ]
 }

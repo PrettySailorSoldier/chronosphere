@@ -1,150 +1,161 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chrono Sphere</title>
-  <link rel="stylesheet" href="popup.css">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="popup.css">
 </head>
 
 <body>
-  <div class="container">
+    <div class="container">
+        <div class="header">
+            <h1>⚡ Chrono Sphere</h1>
 
-    <!-- HEADER -->
-    <header class="header">
-      <div class="header-top">
-        <h1 class="title">✨ Chrono Sphere</h1>
-        <div class="circadian-indicator">
-          <span class="icon" id="circadianIcon">🌅</span>
-          <span class="label" id="circadianLabel">Peak Focus</span>
+            <!-- Circadian Indicator Badge -->
+            <div class="circadian-indicator">
+                <span class="circadian-icon" id="circadianIcon">🌅</span>
+                <span class="circadian-label" id="circadianLabel">Peak Focus</span>
+            </div>
+
+            <!-- Stats Ribbon -->
+            <div class="stats-ribbon">
+                <div class="stat-item">
+                    <span class="stat-value" id="todayCount">0</span>
+                    <span class="stat-label">Done</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-value" id="todayMinutes">0m</span>
+                    <span class="stat-label">Focus</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-value" id="streakCount">0</span>
+                    <span class="stat-label">Streak</span>
+                </div>
+            </div>
         </div>
-      </div>
 
-    </header>
+        <!-- Circadian Rhythm Section -->
+        <div class="circadian-section">
+            <div class="section-header">☀️ Circadian Rhythm</div>
 
-    <!-- CIRCADIAN SECTION -->
-    <section class="glass-card circadian-section">
-      <div class="section-header">
-        <span class="icon">☀️</span>
-        <span>Circadian Rhythm</span>
-      </div>
+            <!-- Energy Slider -->
+            <div class="energy-slider-wrapper">
+                <div class="slider-icons">
+                    <span class="slider-icon">🌙</span>
+                    <span class="slider-icon">☀️</span>
+                </div>
+                <input type="range" class="energy-slider" id="energySlider" min="1" max="3" value="2">
+            </div>
 
-      <div class="energy-slider-wrapper">
-        <div class="slider-icons">
-          <span class="slider-icon">🌙</span>
-          <span class="slider-icon">☀️</span>
+            <!-- Energy Mode Pills -->
+            <div class="circadian-presets">
+                <button class="preset-pill" data-energy="low">Energize</button>
+                <button class="preset-pill active" data-energy="medium">Balanced</button>
+                <button class="preset-pill" data-energy="high">Relax</button>
+            </div>
+
+            <!-- Circadian Recommendation -->
+            <div class="circadian-recommendation">
+                <span class="rec-icon">💡</span>
+                <span class="rec-text" id="circadianRec">Loading recommendations...</span>
+            </div>
+
+            <!-- Suggested Task Cards -->
+            <div class="suggested-tasks" id="suggestedTasks">
+                <!-- Populated dynamically by JS -->
+            </div>
         </div>
-        <input type="range" class="energy-slider" id="energySlider" min="1" max="3" value="2">
-      </div>
 
-      <div class="circadian-presets">
-        <button class="preset-pill" data-energy="low">Energize</button>
-        <button class="preset-pill active" data-energy="medium">Balanced</button>
-        <button class="preset-pill" data-energy="high">Relax</button>
-      </div>
-
-      <div class="circadian-recommendation">
-        <span class="rec-icon">💡</span>
-        <span class="rec-text" id="circadianRec">Loading recommendations...</span>
-      </div>
-
-      <!-- Dynamic Suggested Task Cards -->
-      <div class="suggested-tasks" id="suggestedTasks">
-        <!-- Populated dynamically by JS -->
-      </div>
-    </section>
-
-    <!-- NATURAL LANGUAGE TIMER INPUT -->
-    <section class="glass-card">
-      <input type="text" class="glass-input" id="quickTimerInput" placeholder='E.g., "30 minutes of deep work"'>
-      <button class="glass-button create-btn" id="quickCreateBtn">
-        Create Timer →
-      </button>
-    </section>
-
-    <!-- PRESET TIMER GRID - ASYMMETRIC -->
-    <section class="glass-card">
-      <div class="section-header">
-        <span class="icon">⏰</span>
-        <span>Quick Timers</span>
-      </div>
-
-      <div class="presets-grid">
-        <!-- Pomodoro spans 2 rows -->
-        <button class="preset-btn" data-minutes="25" data-name="Pomodoro" style="grid-row: span 2;">
-          <span class="preset-emoji">🍅</span>
-          <span class="preset-name">Pomodoro</span>
-          <span class="preset-time">25min</span>
-        </button>
-
-        <button class="preset-btn" data-minutes="5" data-name="Short Break">
-          <span class="preset-emoji">☕</span>
-          <span class="preset-name">Short Break</span>
-          <span class="preset-time">5min</span>
-        </button>
-
-        <button class="preset-btn" data-minutes="15" data-name="Long Break">
-          <span class="preset-emoji">🌴</span>
-          <span class="preset-name">Long Break</span>
-          <span class="preset-time">15min</span>
-        </button>
-
-        <button class="preset-btn" data-minutes="52" data-name="Deep Work">
-          <span class="preset-emoji">🎯</span>
-          <span class="preset-name">Deep Work</span>
-          <span class="preset-time">52min</span>
-        </button>
-      </div>
-    </section>
-
-    <!-- TAB FREEZE SECTION -->
-    <section class="glass-card">
-      <div class="section-header">
-        <span class="icon">❄️</span>
-        <span>Tab Freeze</span>
-        <div class="toggle-switch">
-          <input type="checkbox" id="tabFreezeEnabled" checked>
-          <span class="toggle-slider"></span>
+        <!-- Sequences Section -->
+        <div id="sequencesSection" class="sequences-section" style="display:none;">
+            <div class="section-header">Flow Sequences</div>
+            <div class="sequence-controls">
+                <select id="sequenceSelect" class="sequence-select">
+                    <option value="">Select a sequence...</option>
+                </select>
+                <button id="startSequenceBtn" class="sequence-btn">▶ Start</button>
+            </div>
         </div>
-      </div>
 
-      <p class="feature-description">Pause inactive tabs during focus to save RAM</p>
+        <!-- Productivity Presets -->
+        <div class="presets-section">
+            <div class="presets-grid">
+                <button class="preset-btn" data-minutes="25" data-name="Pomodoro">
+                    🍅 Pomodoro<br><span class="preset-time">25min</span>
+                </button>
+                <button class="preset-btn" data-minutes="5" data-name="Short Break">
+                    ☕ Short<br><span class="preset-time">5min</span>
+                </button>
+                <button class="preset-btn" data-minutes="15" data-name="Long Break">
+                    🌙 Long<br><span class="preset-time">15min</span>
+                </button>
+                <button class="preset-btn" data-minutes="52" data-name="Deep Work">
+                    🎯 Deep<br><span class="preset-time">52min</span>
+                </button>
+            </div>
+        </div>
 
-      <div class="whitelist-chips" id="whitelistBox">
-        <!-- Chips generated dynamically -->
-        <button class="chip-add" id="addWhitelistBtn">+ Add</button>
-      </div>
-    </section>
+        <!-- New Timer Section -->
+        <div class="new-timer-section">
+            <div class="section-header">Custom Timer</div>
 
-    <!-- ACTIVE TIMERS -->
-    <section id="activeTimers">
-      <!-- Timer cards generated dynamically -->
-    </section>
+            <div class="input-group">
+                <input type="number" id="hours" placeholder="0" min="0" max="23">
+                <span>h</span>
+                <input type="number" id="minutes" placeholder="0" min="0" max="59">
+                <span>m</span>
+                <input type="number" id="seconds" placeholder="0" min="0" max="59">
+                <span>s</span>
+            </div>
 
-    <!-- SETTINGS -->
-    <section class="glass-card">
-      <div class="section-header">
-        <span class="icon">🔊</span>
-        <span>Sound</span>
-      </div>
-      <div class="sound-controls">
-        <select class="glass-input sound-select" id="soundSelect">
-          <option value="chime">Chime</option>
-          <option value="water">Water</option>
-          <option value="alarm">Alarm</option>
-          <option value="bell">Bell</option>
-          <option value="birds">Birds</option>
-          <option value="gong">Gong</option>
-          <option value="piano">Piano</option>
-        </select>
-        <button id="previewSoundBtn" class="sound-preview-btn">▶️</button>
-      </div>
-      <input type="range" id="volumeControl" min="0" max="100" value="80" class="volume-slider">
-    </section>
+            <input type="text" id="timerName" placeholder="Timer name (optional)" class="timer-name-input">
 
-  </div>
-  <script src="popup.js"></script>
+            <div class="sound-selector">
+                <label for="soundSelect">🔊 Sound:</label>
+                <select id="soundSelect">
+                    <option value="chime">🔔 Gentle Chime</option>
+                    <option value="water">💧 Running Water</option>
+                    <option value="alarm">⏰ Stark Alarm</option>
+                    <option value="custom">📁 Upload Custom</option>
+                </select>
+                <input type="file" id="customSound" accept="audio/*" style="display:none;">
+            </div>
+
+            <div class="notification-input">
+                <label for="notificationMsg">💬 Notification message:</label>
+                <input type="text" id="notificationMsg" placeholder="Time's up! ✨" class="notification-msg-input">
+            </div>
+
+            <button id="startBtn" class="start-btn">Start Timer</button>
+        </div>
+
+        <!-- Active Timers List -->
+        <div id="timersList" class="timers-list">
+            <!-- Timers will be dynamically added here -->
+        </div>
+
+        <!-- History Section -->
+        <div class="history-section" id="historySection">
+            <div class="history-header">
+                <span>📜 History</span>
+                <button id="historyToggle" class="history-toggle-btn">Show ▼</button>
+            </div>
+            <div id="historyList" class="history-list">
+                <!-- History items will be dynamically added here -->
+            </div>
+        </div>
+
+        <div class="settings-link">
+            <div class="footer-buttons">
+                <button id="statsBtn" class="subtle-btn">📊 Stats</button>
+                <button id="settingsBtn" class="subtle-btn">⚙️ Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
 </body>
 
 </html>

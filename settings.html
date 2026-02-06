@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="popup.css">
+    <script src="theme.js"></script>
+    <style>
+        .settings-container {
+            padding: 20px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--periwinkle);
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 8px 0;
+        }
+
+        .back-btn:hover {
+            color: var(--bright-pink);
+        }
+
+        .settings-section {
+            background: var(--dark-card);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(155, 135, 245, 0.2);
+        }
+
+        .settings-section h3 {
+            font-size: 14px;
+            color: var(--periwinkle);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(155, 135, 245, 0.1);
+        }
+
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .setting-description {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+
+        /* Toggle Switch */
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--dark-card-light);
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle input:checked+.toggle-slider {
+            background: linear-gradient(135deg, var(--periwinkle), var(--bright-pink));
+        }
+
+        .toggle input:checked+.toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Volume Slider */
+        .volume-slider {
+            width: 120px;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--dark-card-light);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, var(--periwinkle), var(--bright-pink));
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .preset-input {
+            width: 60px;
+            padding: 8px;
+            border: 2px solid var(--dark-card-light);
+            border-radius: 8px;
+            background: var(--dark-bg);
+            color: #fff;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .preset-input:focus {
+            outline: none;
+            border-color: var(--periwinkle);
+        }
+
+        .theme-select {
+            padding: 8px 12px;
+            border: 2px solid var(--dark-card-light);
+            border-radius: 8px;
+            background: var(--dark-bg);
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .theme-select:focus {
+            outline: none;
+            border-color: var(--periwinkle);
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--periwinkle) 0%, var(--bright-pink) 100%);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 105, 180, 0.6);
+        }
+
+        .reset-btn {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(239, 68, 68, 0.5);
+            border-radius: 12px;
+            background: transparent;
+            color: #ef4444;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+        }
+
+        /* Sequences Styles */
+        .sequences-list {
+            margin-bottom: 15px;
+        }
+
+        .sequence-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: var(--dark-bg);
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+
+        .sequence-info {
+            flex: 1;
+        }
+
+        .sequence-name {
+            font-weight: 600;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .sequence-preview {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+
+        .sequence-delete-btn {
+            background: rgba(239, 68, 68, 0.2);
+            border: none;
+            color: #ef4444;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .sequence-delete-btn:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
+
+        .sequence-builder {
+            background: var(--dark-bg);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .sequence-name-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid var(--dark-card-light);
+            border-radius: 8px;
+            background: var(--dark-card);
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .sequence-name-input:focus {
+            outline: none;
+            border-color: var(--periwinkle);
+        }
+
+        .sequence-steps {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+            min-height: 36px;
+        }
+
+        .step-tag {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            background: linear-gradient(135deg, var(--periwinkle), var(--bright-pink));
+            border-radius: 20px;
+            font-size: 12px;
+            color: #fff;
+        }
+
+        .step-remove {
+            cursor: pointer;
+            opacity: 0.7;
+        }
+
+        .step-remove:hover {
+            opacity: 1;
+        }
+
+        .sequence-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .step-type-select {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid var(--dark-card-light);
+            border-radius: 8px;
+            background: var(--dark-card);
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .step-type-select:focus {
+            outline: none;
+            border-color: var(--periwinkle);
+        }
+
+        .add-step-btn {
+            padding: 10px 16px;
+            border: 2px solid var(--periwinkle);
+            border-radius: 8px;
+            background: transparent;
+            color: var(--periwinkle);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-step-btn:hover {
+            background: var(--periwinkle);
+            color: #fff;
+        }
+
+        .save-sequence-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--sunset-orange), var(--sunset-yellow));
+            color: #000;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.2s;
+        }
+
+        .save-sequence-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .empty-sequences {
+            text-align: center;
+            padding: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+        }
+
+        /* Custom Sounds */
+        .custom-sounds-list {
+            margin-bottom: 10px;
+        }
+
+        .custom-sound-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: var(--dark-bg);
+            border-radius: 8px;
+            margin-bottom: 6px;
+        }
+
+        .sound-info {
+            flex: 1;
+        }
+
+        .sound-name {
+            font-size: 13px;
+            color: #fff;
+        }
+
+        .sound-date {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 2px;
+        }
+
+        .sound-delete-btn {
+            background: rgba(239, 68, 68, 0.2);
+            border: none;
+            color: #ef4444;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .sound-delete-btn:hover {
+            background: rgba(239, 68, 68, 0.4);
+        }
+
+        .empty-sounds {
+            text-align: center;
+            padding: 15px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+        }
+
+        .sounds-note {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .sound-control-btn {
+            background: rgba(155, 135, 245, 0.2);
+            border: none;
+            color: var(--periwinkle);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sound-control-btn:hover {
+            background: var(--periwinkle);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="settings-container">
+        <button class="back-btn" id="backBtn" aria-label="Go back to timer">← Back to Timer</button>
+
+        <div class="header">
+            <h1>⚙️ Settings</h1>
+        </div>
+
+        <!-- Theme Settings -->
+        <div class="settings-section" role="region" aria-label="Appearance settings">
+            <h3 id="appearanceHeading">🎨 Appearance</h3>
+
+            <div class="setting-row">
+                <div>
+                    <label for="themeSelect" class="setting-label">Theme</label>
+                    <div class="setting-description">Choose your preferred color scheme</div>
+                </div>
+                <select id="themeSelect" class="theme-select" aria-describedby="themeDesc">
+                    <option value="dark">🌙 Dark</option>
+                    <option value="light">☀️ Light</option>
+                    <option value="system">🖥️ System</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Sound Settings -->
+        <div class="settings-section" role="region" aria-label="Sound settings">
+            <h3 id="soundHeading">🔊 Sound</h3>
+
+            <div class="setting-row">
+                <div>
+                    <span class="setting-label" id="soundEnabledLabel">Sound Enabled</span>
+                    <div class="setting-description">Play sound when timer completes</div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="soundEnabled" checked aria-labelledby="soundEnabledLabel">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-row">
+                <div>
+                    <label for="volume" class="setting-label">Volume</label>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span id="volumeValue"
+                        style="color: var(--periwinkle); font-size: 14px; min-width: 35px;">70%</span>
+                    <input type="range" class="volume-slider" id="volume" min="0" max="100" value="70"
+                        aria-label="Volume level">
+                </div>
+            </div>
+
+            <div class="setting-row">
+                <div>
+                    <span class="setting-label" id="previewLabel">Preview Sound</span>
+                    <div class="setting-description">Test notification volume</div>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button id="previewSoundBtn" class="sound-control-btn" aria-label="Play preview sound">▶️</button>
+                    <button id="stopSoundBtn" class="sound-control-btn" aria-label="Stop sound">🛑</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Sounds -->
+        <div class="settings-section" role="region" aria-label="Custom sounds management">
+            <h3>🎵 Custom Sounds</h3>
+            <div class="setting-description" style="margin-bottom: 12px;">
+                Manage your uploaded custom notification sounds. Click ▶️ to preview.
+            </div>
+
+            <div id="customSoundsList" class="custom-sounds-list" role="list" aria-label="Saved custom sounds">
+                <!-- Custom sounds will be rendered here -->
+            </div>
+
+            <div class="sounds-note">
+                Upload sounds from the main timer page (max 10)
+            </div>
+        </div>
+
+        <!-- Notification Settings -->
+        <div class="settings-section" role="region" aria-label="Notification settings">
+            <h3 id="notifHeading">🔔 Notifications</h3>
+
+            <div class="setting-row">
+                <div>
+                    <span class="setting-label" id="notifEnabledLabel">Show Notifications</span>
+                    <div class="setting-description">Display system notification when timer ends</div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="notificationsEnabled" checked aria-labelledby="notifEnabledLabel">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="setting-row">
+                <div>
+                    <span class="setting-label" id="autoStartLabel">Auto-start Breaks</span>
+                    <div class="setting-description">Automatically start break after Pomodoro</div>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="autoStartBreaks" aria-labelledby="autoStartLabel">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Preset Customization -->
+        <div class="settings-section" role="region" aria-label="Preset timer durations">
+            <h3 id="presetHeading">⏱️ Preset Durations (minutes)</h3>
+
+            <div class="setting-row">
+                <label for="pomodoroTime" class="setting-label">🍅 Pomodoro</label>
+                <input type="number" class="preset-input" id="pomodoroTime" value="25" min="1" max="120"
+                    aria-label="Pomodoro duration in minutes">
+            </div>
+
+            <div class="setting-row">
+                <label for="shortBreakTime" class="setting-label">☕ Short Break</label>
+                <input type="number" class="preset-input" id="shortBreakTime" value="5" min="1" max="60"
+                    aria-label="Short break duration in minutes">
+            </div>
+
+            <div class="setting-row">
+                <label for="longBreakTime" class="setting-label">🌙 Long Break</label>
+                <input type="number" class="preset-input" id="longBreakTime" value="15" min="1" max="60"
+                    aria-label="Long break duration in minutes">
+            </div>
+
+            <div class="setting-row">
+                <label for="deepWorkTime" class="setting-label">🎯 Deep Work</label>
+                <input type="number" class="preset-input" id="deepWorkTime" value="52" min="1" max="180"
+                    aria-label="Deep work duration in minutes">
+            </div>
+        </div>
+
+        <!-- Timer Sequences -->
+        <div class="settings-section" role="region" aria-label="Timer sequences">
+            <h3 id="sequenceHeading">🔗 Timer Sequences</h3>
+            <div class="setting-description" style="margin-bottom: 15px;">
+                Create custom timer chains that run automatically
+            </div>
+
+            <div id="sequencesList" class="sequences-list" role="list" aria-label="Saved sequences">
+                <!-- Sequences will be rendered here -->
+            </div>
+
+            <div class="sequence-builder" role="group" aria-label="Create new sequence">
+                <input type="text" class="sequence-name-input" id="newSequenceName" placeholder="Sequence name..."
+                    aria-label="New sequence name">
+                <div class="sequence-steps" id="sequenceSteps" role="list" aria-label="Sequence steps">
+                    <!-- Steps will be added here -->
+                </div>
+                <div class="sequence-actions">
+                    <label for="stepTypeSelect" class="visually-hidden">Select timer type to add</label>
+                    <select class="step-type-select" id="stepTypeSelect" aria-label="Timer type to add">
+                        <option value="pomodoro">🍅 Pomodoro</option>
+                        <option value="shortBreak">☕ Short Break</option>
+                        <option value="longBreak">🌙 Long Break</option>
+                        <option value="deepWork">🎯 Deep Work</option>
+                    </select>
+                    <button class="add-step-btn" id="addStepBtn" aria-label="Add step to sequence">+ Add Step</button>
+                </div>
+                <div class="setting-row" style="border-bottom: none; padding-bottom: 0;">
+                    <div>
+                        <span class="setting-label" id="loopLabel">Loop Sequence</span>
+                        <div class="setting-description">Repeat when finished</div>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" id="sequenceLoop" aria-labelledby="loopLabel">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <button class="save-sequence-btn" id="saveSequenceBtn" aria-label="Save new sequence">💾 Save
+                    Sequence</button>
+            </div>
+        </div>
+
+        <button class="save-btn" id="saveBtn" aria-label="Save all settings">💾 Save Settings</button>
+        <button class="reset-btn" id="resetBtn" aria-label="Reset all settings to defaults">🔄 Reset to
+            Defaults</button>
+    </div>
+
+    <script src="settings.js"></script>
+</body>
+
+</html>

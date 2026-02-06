@@ -1,0 +1,25 @@
+{
+  "name": "chrono-sphere",
+  "version": "1.0.0",
+  "description": "A beautiful, productivity-focused timer extension with holographic aesthetics",
+  "private": true,
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "generate-sounds": "node generate-sounds.js"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5"
+  },
+  "keywords": [
+    "chrome-extension",
+    "timer",
+    "pomodoro",
+    "productivity"
+  ],
+  "license": "MIT"
+}
